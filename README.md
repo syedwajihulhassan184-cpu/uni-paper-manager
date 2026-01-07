@@ -312,27 +312,6 @@ Admin (1) → (Many) Exam
 
 ---
 
-## 🧪 Testing
-
-### Run Tests
-```bash
-# Run all tests
-python manage.py test
-
-# Run specific app tests
-python manage.py test accounts
-python manage.py test exams
-
-# Run with verbosity
-python manage.py test --verbosity=2
-```
-
-### Test Accounts
-Use the provided sample accounts to test all features:
-- Admin features: `admin@test.com`
-- Student features: `student1@test.com` to `student10@test.com`
-
----
 
 ## 📋 Management Commands
 
