@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Online Exam Management System{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #10B981;
+            --danger-color: #EF4444;
+            --warning-color: #F59E0B;
+            --dark-color: #1F2937;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #F9FAFB;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #6366F1 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+        
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background-color: white;
+            border-right: 1px solid #E5E7EB;
+            padding: 1.5rem 0;
+        }
+        
+        .sidebar .nav-link {
+            color: #4B5563;
+            padding: 0.75rem 1.5rem;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: #F3F4F6;
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+        
+        .sidebar .nav-link.active {
+            color: var(--primary-color);
+            background-color: #EEF2FF;
+            border-left-color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        .main-content {
+            padding: 2rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #E5E7EB;
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #4338CA;
+            border-color: #4338CA;
+        }
+        
+        .btn-success {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .badge {
+            padding: 0.375rem 0.75rem;
+            font-weight: 500;
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 8px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+        }
+        
+        .table {
+            background-color: white;
+        }
+        
+        .table thead th {
+            background-color: #F9FAFB;
+            border-bottom: 2px solid #E5E7EB;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: #6B7280;
+        }
+        
+        .pagination .page-link {
+            color: var(--primary-color);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #6366F1 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card.success {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #34D399 100%);
+        }
+        
+        .stat-card.warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #FBBF24 100%);
+        }
+        
+        .stat-card.danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #F87171 100%);
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card p {
+            margin: 0;
+            opacity: 0.9;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'dashboard' %}">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Exam Portal
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i>
+                                {{ user.full_name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'profile' %}">
+                                    <i class="fas fa-user me-2"></i>Profile
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'change_password' %}">
+                                    <i class="fas fa-key me-2"></i>Change Password
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register_student' %}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            {% if user.is_authenticated %}
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <nav class="nav flex-column">
+                    {% if user.user_type == 'student' %}
+                        <a class="nav-link {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}" href="{% url 'student_dashboard' %}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                        <a class="nav-link {% if 'enrollment' in request.path %}active{% endif %}" href="{% url 'my_enrollments' %}">
+                            <i class="fas fa-book"></i> My Enrollments
+                        </a>
+                        <a class="nav-link {% if 'available-courses' in request.path %}active{% endif %}" href="{% url 'available_courses' %}">
+                            <i class="fas fa-search"></i> Browse Courses
+                        </a>
+                        <a class="nav-link {% if 'exams' in request.path %}active{% endif %}" href="{% url 'exam_list_student' %}">
+                            <i class="fas fa-file-alt"></i> My Exams
+                        </a>
+                        <a class="nav-link {% if 'results' in request.path %}active{% endif %}" href="{% url 'view_results' %}">
+                            <i class="fas fa-chart-bar"></i> Results
+                        </a>
+                    {% elif user.user_type == 'admin' %}
+                        <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'admin_dashboard' %}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                        <a class="nav-link {% if 'departments' in request.path %}active{% endif %}" href="{% url 'department_list' %}">
+                            <i class="fas fa-building"></i> Departments
+                        </a>
+                        <a class="nav-link {% if 'programs' in request.path %}active{% endif %}" href="{% url 'program_list' %}">
+                            <i class="fas fa-graduation-cap"></i> Programs
+                        </a>
+                        <a class="nav-link {% if 'courses' in request.path %}active{% endif %}" href="{% url 'course_list' %}">
+                            <i class="fas fa-book"></i> Courses
+                        </a>
+                        <a class="nav-link {% if 'exam' in request.path %}active{% endif %}" href="{% url 'exam_list_admin' %}">
+                            <i class="fas fa-file-alt"></i> Exams
+                        </a>
+                        <a class="nav-link {% if 'enrollments/admin' in request.path %}active{% endif %}" href="{% url 'manage_enrollments' %}">
+                            <i class="fas fa-users"></i> Enrollments
+                        </a>
+                    {% endif %}
+                </nav>
+            </div>
+            {% endif %}
+
+            <!-- Main Content -->
+            <div class="col-md-{% if user.is_authenticated %}10{% else %}12{% endif %} main-content">
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Form validation feedback
+        (function () {
+            'use strict'
+            const forms = document.querySelectorAll('.needs-validation')
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+
+        // Confirm delete actions
+        function confirmDelete(message) {
+            return confirm(message || 'Are you sure you want to delete this item? This action cannot be undone.');
+        }
+
+        // File input preview
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                const fileName = this.files[0]?.name;
+                const label = this.nextElementSibling;
+                if (label && fileName) {
+                    label.textContent = fileName;
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

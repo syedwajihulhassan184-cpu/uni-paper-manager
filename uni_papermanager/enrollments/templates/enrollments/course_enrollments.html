@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.course_name }} - Enrollments{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>{{ course.course_name }}</h2>
+        <p class="text-muted">{{ course.program.program_name }} - {{ course.program.department.department_name }}</p>
+    </div>
+    <a href="{% url 'bulk_enroll' course.course_id %}" class="btn btn-primary">
+        <i class="fas fa-user-plus me-2"></i>Bulk Enroll Students
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <h3 class="text-primary">{{ total_enrollments }}</h3>
+                <p class="mb-0">Total Enrollments</p>
+            </div>
+            <div class="col-md-4">
+                <h3 class="text-info">{{ enrollment_data.0.exam_count|default:0 }}</h3>
+                <p class="mb-0">Course Exams</p>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'course_detail' course.course_id %}" class="btn btn-outline-primary">
+                    <i class="fas fa-eye me-2"></i>View Course
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-users me-2"></i>Enrolled Students</h5>
+    </div>
+    <div class="card-body">
+        {% if enrollment_data %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Email</th>
+                        <th>Program</th>
+                        <th>Enrolled Date</th>
+                        <th>Submissions</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in enrollment_data %}
+                    <tr>
+                        <td><strong>{{ data.enrollment.student.user.full_name }}</strong></td>
+                        <td>{{ data.enrollment.student.user.email }}</td>
+                        <td>{{ data.enrollment.student.program.program_name }}</td>
+                        <td>{{ data.enrollment.enrollment_date|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="badge bg-info">
+                                {{ data.submission_count }} / {{ data.exam_count }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'student_enrollments_admin' data.enrollment.student.student_id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i>View
+                            </a>
+                            <a href="{% url 'delete_enrollment_admin' data.enrollment.enrollment_id %}" class="btn btn-sm btn-outline-danger" onclick="return confirmDelete('{{ data.enrollment.student.user.full_name }}')">
+                                <i class="fas fa-trash me-1"></i>Remove
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No students enrolled in this course yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

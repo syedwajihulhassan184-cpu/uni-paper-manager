@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Enrollments{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="fas fa-users me-2"></i>Manage Enrollments</h2>
+
+<!-- Filter Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Course</label>
+                {{ filter_form.course }}
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Program</label>
+                {{ filter_form.program }}
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Search</label>
+                {{ filter_form.search_query }}
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-2"></i>Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Enrollments Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Email</th>
+                        <th>Course</th>
+                        <th>Program</th>
+                        <th>Enrolled Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in page_obj %}
+                    <tr>
+                        <td><strong>{{ enrollment.student.user.full_name }}</strong></td>
+                        <td>{{ enrollment.student.user.email }}</td>
+                        <td>{{ enrollment.course.course_name }}</td>
+                        <td>{{ enrollment.student.program.program_name }}</td>
+                        <td>{{ enrollment.enrollment_date|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="{% url 'student_enrollments_admin' enrollment.student.student_id %}" class="btn btn-sm btn-outline-primary" title="View Student's Enrollments">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'delete_enrollment_admin' enrollment.enrollment_id %}" class="btn btn-sm btn-outline-danger" onclick="return confirmDelete('this enrollment')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No enrollments found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

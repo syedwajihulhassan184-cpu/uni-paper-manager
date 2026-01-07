@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Departments{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-building me-2"></i>Departments</h2>
+    {% if user.user_type == 'admin' %}
+    <a href="{% url 'create_department' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add Department
+    </a>
+    {% endif %}
+</div>
+
+<div class="row">
+    {% for department in departments %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-building text-primary me-2"></i>
+                    {{ department.department_name }}
+                </h5>
+                <p class="text-muted mb-3">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    {{ department.program_count }} Program{{ department.program_count|pluralize }}
+                </p>
+                <a href="{% url 'department_detail' department.department_id %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-eye me-1"></i>View Details
+                </a>
+                {% if user.user_type == 'admin' %}
+                <a href="{% url 'update_department' department.department_id %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-edit me-1"></i>Edit
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>No departments found.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

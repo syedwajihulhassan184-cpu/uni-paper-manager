@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}My Enrollments{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-book me-2"></i>My Enrollments</h2>
+    <a href="{% url 'available_courses' %}" class="btn btn-primary">
+        <i class="fas fa-search me-2"></i>Browse More Courses
+    </a>
+</div>
+
+{% if enrollments %}
+<div class="row">
+    {% for enrollment in enrollments %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ enrollment.course.course_name }}</h5>
+                <p class="text-muted mb-2">
+                    <i class="fas fa-graduation-cap me-1"></i>
+                    {{ enrollment.course.program.program_name }}
+                </p>
+                <p class="text-muted mb-3">
+                    <i class="fas fa-building me-1"></i>
+                    {{ enrollment.course.program.department.department_name }}
+                </p>
+                
+                <div class="mb-3">
+                    <small class="text-muted">
+                        <i class="fas fa-calendar me-1"></i>
+                        Enrolled: {{ enrollment.enrollment_date|date:"M d, Y" }}
+                    </small><br>
+                    <small class="text-muted">
+                        <i class="fas fa-file-alt me-1"></i>
+                        {{ enrollment.exam_count }} exam{{ enrollment.exam_count|pluralize }}
+                    </small>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="{% url 'enrollment_detail' enrollment.enrollment_id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-2"></i>View Details
+                    </a>
+                    <a href="{% url 'course_detail' enrollment.course.course_id %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-info-circle me-2"></i>Course Info
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-book-open fa-4x text-muted mb-3"></i>
+        <h4>No Enrollments Yet</h4>
+        <p class="text-muted">You haven't enrolled in any courses yet. Start browsing available courses to begin your learning journey.</p>
+        <a href="{% url 'available_courses' %}" class="btn btn-primary">
+            <i class="fas fa-search me-2"></i>Browse Courses
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

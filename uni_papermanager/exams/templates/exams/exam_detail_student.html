@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ exam.exam_title }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'exam_list_student' %}">My Exams</a></li>
+        <li class="breadcrumb-item active">{{ exam.exam_title }}</li>
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <h2 class="mb-3">{{ exam.exam_title }}</h2>
+                
+                <div class="mb-3">
+                    <p class="mb-2">
+                        <strong><i class="fas fa-book me-2"></i>Course:</strong> 
+                        {{ exam.course.course_name }}
+                    </p>
+                    <p class="mb-2">
+                        <strong><i class="fas fa-graduation-cap me-2"></i>Program:</strong> 
+                        {{ exam.course.program.program_name }}
+                    </p>
+                    <p class="mb-2">
+                        <strong><i class="fas fa-building me-2"></i>Department:</strong> 
+                        {{ exam.course.program.department.department_name }}
+                    </p>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <strong><i class="fas fa-calendar-alt me-2"></i>Start Time:</strong><br>
+                            {{ exam.start_time|date:"l, F d, Y" }}<br>
+                            {{ exam.start_time|date:"g:i A" }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <strong><i class="fas fa-calendar-check me-2"></i>End Time:</strong><br>
+                            {{ exam.end_time|date:"l, F d, Y" }}<br>
+                            {{ exam.end_time|date:"g:i A" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                {% load tz %}
+                {% now "U" as current_timestamp %}
+                {% if is_active %}
+                    <div class="alert alert-success">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-play-circle me-2"></i>Exam is Active!
+                        </h5>
+                        <hr>
+                        <p class="mb-2"><strong>Time Remaining:</strong></p>
+                        <h4 class="text-success mb-0">
+                            {{ exam.end_time|timeuntil }}
+                        </h4>
+                    </div>
+                {% elif exam.start_time.timestamp > current_timestamp|add:"0" %}
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-clock me-2"></i>Upcoming Exam
+                        </h5>
+                        <hr>
+                        <p class="mb-2"><strong>Starts in:</strong></p>
+                        <h4 class="text-info mb-0">
+                            {{ exam.start_time|timeuntil }}
+                        </h4>
+                    </div>
+                {% else %}
+                    <div class="alert alert-secondary">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-check-circle me-2"></i>Exam Completed
+                        </h5>
+                        <hr>
+                        <p class="mb-0">
+                            <strong>Ended:</strong><br>
+                            {{ exam.end_time|date:"M d, Y H:i" }}
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Submission Status -->
+{% if submission %}
+    <div class="alert alert-success">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle fa-2x me-3"></i>
+            <div class="flex-grow-1">
+                <h5 class="mb-1">Exam Submitted Successfully!</h5>
+                <p class="mb-0">You submitted this exam on {{ submission.submission_time|date:"F d, Y" }} at {{ submission.submission_time|date:"g:i A" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Display -->
+    {% if result %}
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Your Result</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center mb-4">
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <h1 class="text-primary mb-2">{{ result.marks }}%</h1>
+                            <p class="text-muted mb-0">Marks Obtained</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <h1 class="
+                                {% if result.grade == 'A+' or result.grade == 'A' %}text-success
+                                {% elif result.grade == 'B+' or result.grade == 'B' %}text-info
+                                {% elif result.grade == 'C+' or result.grade == 'C' %}text-warning
+                                {% else %}text-danger{% endif %} mb-2">
+                                {{ result.grade }}
+                            </h1>
+                            <p class="text-muted mb-0">Grade</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <a href="{{ submission.file_path.url }}" class="btn btn-outline-primary btn-lg" download>
+                                <i class="fas fa-download me-2"></i>Download Submission
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Indicator -->
+                <div class="mb-4">
+                    <label class="form-label"><strong>Performance:</strong></label>
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar 
+                            {% if result.marks >= 90 %}bg-success
+                            {% elif result.marks >= 70 %}bg-info
+                            {% elif result.marks >= 50 %}bg-warning
+                            {% else %}bg-danger{% endif %}" 
+                            role="progressbar" 
+                            style="width: {{ result.marks }}%;" 
+                            aria-valuenow="{{ result.marks }}" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100">
+                            <strong>{{ result.marks }}%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                {% if result.feedback %}
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-comment-dots me-2"></i>Instructor Feedback
+                        </h6>
+                        <p class="card-text mb-0">{{ result.feedback }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <!-- Pending Grading -->
+        <div class="card border-warning">
+            <div class="card-body text-center py-4">
+                <i class="fas fa-hourglass-half fa-3x text-warning mb-3"></i>
+                <h5>Grading in Progress</h5>
+                <p class="text-muted mb-0">Your submission is currently being reviewed by the instructor. Results will be available soon.</p>
+            </div>
+        </div>
+    {% endif %}
+
+{% else %}
+    <!-- No Submission Yet -->
+    <div class="card">
+        <div class="card-body">
+            {% if is_active %}
+                <!-- Active Exam - Can Submit -->
+                <div class="text-center py-4">
+                    <i class="fas fa-file-upload fa-4x text-primary mb-3"></i>
+                    <h4 class="mb-3">Ready to Submit Your Exam?</h4>
+                    <p class="text-muted mb-4">Upload your completed exam file before the deadline.</p>
+                    
+                    <div class="alert alert-warning mb-4">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Important:</strong> Make sure your exam is complete. You can only submit once!
+                    </div>
+
+                    <a href="{% url 'submit_exam' exam.exam_id %}" class="btn btn-success btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Exam Now
+                    </a>
+                </div>
+
+            {% elif exam.start_time.timestamp > current_timestamp|add:"0" %}
+                <!-- Upcoming Exam -->
+                <div class="text-center py-4">
+                    <i class="fas fa-clock fa-4x text-info mb-3"></i>
+                    <h4 class="mb-3">Exam Not Started Yet</h4>
+                    <p class="text-muted mb-4">This exam will be available for submission once it starts.</p>
+                    
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="mb-2">Exam starts in:</h6>
+                            <h3 class="text-info mb-0">{{ exam.start_time|timeuntil }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+                <!-- Expired Exam -->
+                <div class="text-center py-4">
+                    <i class="fas fa-times-circle fa-4x text-danger mb-3"></i>
+                    <h4 class="mb-3">Submission Deadline Passed</h4>
+                    <p class="text-muted mb-0">The deadline for this exam has passed. You can no longer submit.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- Action Buttons -->
+<div class="mt-4">
+    <a href="{% url 'exam_list_student' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Exams
+    </a>
+    {% if submission and result %}
+        <a href="{% url 'view_results' %}" class="btn btn-outline-primary">
+            <i class="fas fa-chart-bar me-2"></i>View All Results
+        </a>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Programs{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-graduation-cap me-2"></i>Programs</h2>
+    {% if user.user_type == 'admin' %}
+    <a href="{% url 'create_program' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add Program
+    </a>
+    {% endif %}
+</div>
+
+<!-- Filter Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label">Filter by Department</label>
+                {{ filter_form.department }}
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="fas fa-filter me-2"></i>Filter
+                </button>
+                <a href="{% url 'program_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-redo me-2"></i>Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Programs Grid -->
+<div class="row">
+    {% for program in programs %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-graduation-cap text-primary me-2"></i>
+                    {{ program.program_name }}
+                </h5>
+                <p class="text-muted mb-2">
+                    <i class="fas fa-building me-2"></i>
+                    {{ program.department.department_name }}
+                </p>
+                <p class="text-muted mb-3">
+                    <i class="fas fa-book me-2"></i>
+                    {{ program.course_count }} Course{{ program.course_count|pluralize }}
+                </p>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'program_detail' program.program_id %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </a>
+                    {% if user.user_type == 'admin' %}
+                    <a href="{% url 'update_program' program.program_id %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-edit me-1"></i>Edit
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>No programs found.
+            {% if user.user_type == 'admin' %}
+                <a href="{% url 'create_program' %}">Create your first program</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

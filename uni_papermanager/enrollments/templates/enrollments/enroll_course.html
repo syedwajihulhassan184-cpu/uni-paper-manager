@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Enroll in {{ course.course_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Confirm Enrollment</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You are about to enroll in the following course:
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5>{{ course.course_name }}</h5>
+                        <p class="mb-2">
+                            <strong>Program:</strong> {{ course.program.program_name }}
+                        </p>
+                        <p class="mb-2">
+                            <strong>Department:</strong> {{ course.program.department.department_name }}
+                        </p>
+                    </div>
+                </div>
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="form-check mb-3">
+                        {{ confirm_form.confirm }}
+                        <label class="form-check-label" for="{{ confirm_form.confirm.id_for_label }}">
+                            {{ confirm_form.confirm.label }}
+                        </label>
+                        {% if confirm_form.confirm.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ confirm_form.confirm.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-2"></i>Confirm Enrollment
+                        </button>
+                        <a href="{% url 'available_courses' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

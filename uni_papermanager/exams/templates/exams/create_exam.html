@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Exam{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Create New Exam</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.exam_title.id_for_label }}" class="form-label">
+                            Exam Title *
+                        </label>
+                        {{ form.exam_title }}
+                        {% if form.exam_title.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.exam_title.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.course.id_for_label }}" class="form-label">
+                            Select Course *
+                        </label>
+                        {{ form.course }}
+                        {% if form.course.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.course.errors }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Only students enrolled in this course will be able to take the exam
+                        </small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.start_time.id_for_label }}" class="form-label">
+                                Start Date & Time *
+                            </label>
+                            {{ form.start_time }}
+                            {% if form.start_time.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.start_time.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                When students can start submitting
+                            </small>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.end_time.id_for_label }}" class="form-label">
+                                End Date & Time *
+                            </label>
+                            {{ form.end_time }}
+                            {% if form.end_time.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.end_time.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Submission deadline
+                            </small>
+                        </div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <!-- Information Alert -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>Important Information
+                        </h6>
+                        <ul class="mb-0">
+                            <li>Exam duration must be between <strong>15 minutes</strong> and <strong>24 hours</strong></li>
+                            <li>Start time cannot be in the past</li>
+                            <li>Students can only submit files during the active exam period</li>
+                            <li>Accepted file formats: PDF, DOC, DOCX, TXT, ZIP (max 10MB)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Create Exam
+                        </button>
+                        <a href="{% url 'exam_list_admin' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Help Card -->
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-question-circle me-2"></i>Need Help?</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Tips for Creating Exams:</strong></p>
+                <ul class="mb-0">
+                    <li>Give students enough time to complete and upload their answers</li>
+                    <li>Consider timezone differences if you have remote students</li>
+                    <li>Use clear, descriptive titles (e.g., "Midterm Exam - Data Structures")</li>
+                    <li>Test the exam timing before announcing it to students</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set minimum date to current date/time
+    document.addEventListener('DOMContentLoaded', function() {
+        const startTimeInput = document.querySelector('input[name="start_time"]');
+        const endTimeInput = document.querySelector('input[name="end_time"]');
+        
+        if (startTimeInput && endTimeInput) {
+            // Get current date/time
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            const minDateTime = now.toISOString().slice(0, 16);
+            
+            // Set minimum start time to now
+            startTimeInput.min = minDateTime;
+            
+            // Update end time minimum when start time changes
+            startTimeInput.addEventListener('change', function() {
+                const startValue = new Date(this.value);
+                startValue.setMinutes(startValue.getMinutes() + 15); // Minimum 15 minutes
+                endTimeInput.min = startValue.toISOString().slice(0, 16);
+                
+                // If end time is before new start time, clear it
+                if (endTimeInput.value && new Date(endTimeInput.value) < startValue) {
+                    endTimeInput.value = '';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

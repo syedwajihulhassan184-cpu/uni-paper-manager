@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Enrollment{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0"><i class="fas fa-user-minus me-2"></i>Remove Enrollment</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Warning:</strong> This will remove the student from the course!
+                </div>
+
+                <h5>Confirm Enrollment Removal</h5>
+                
+                <div class="card my-4">
+                    <div class="card-body">
+                        <p class="mb-1"><strong>Student:</strong> {{ enrollment.student.user.full_name }}</p>
+                        <p class="mb-1"><strong>Email:</strong> {{ enrollment.student.user.email }}</p>
+                        <p class="mb-1"><strong>Course:</strong> {{ enrollment.course.course_name }}</p>
+                        <p class="mb-0"><strong>Enrolled:</strong> {{ enrollment.enrollment_date|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-user-minus me-2"></i>Yes, Remove Enrollment
+                        </button>
+                        <a href="{% url 'manage_enrollments' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

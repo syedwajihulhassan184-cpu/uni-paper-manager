@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.course_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'course_list' %}">Courses</a></li>
+        <li class="breadcrumb-item active">{{ course.course_name }}</li>
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="mb-3">{{ course.course_name }}</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Program:</strong> {{ course.program.program_name }}</p>
+                <p><strong>Department:</strong> {{ course.program.department.department_name }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Total Exams:</strong> {{ exams.count }}</p>
+                {% if user.user_type == 'student' %}
+                <p><strong>Enrollment Status:</strong> 
+                    {% if is_enrolled %}
+                        <span class="badge bg-success">Enrolled</span>
+                    {% else %}
+                        <span class="badge bg-warning">Not Enrolled</span>
+                    {% endif %}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if user.user_type == 'student' and not is_enrolled %}
+        <div class="mt-3">
+            <a href="{% url 'enroll_course' course.course_id %}" class="btn btn-success">
+                <i class="fas fa-user-plus me-2"></i>Enroll in this Course
+            </a>
+        </div>
+        {% endif %}
+
+        {% if user.user_type == 'admin' %}
+        <div class="mt-3">
+            <a href="{% url 'update_course' course.course_id %}" class="btn btn-primary me-2">
+                <i class="fas fa-edit me-2"></i>Edit Course
+            </a>
+            <a href="{% url 'create_exam' %}?course={{ course.course_id }}" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Create Exam
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Exams List -->
+{% if exams %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Exams</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Exam Title</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in exams %}
+                    <tr>
+                        <td><strong>{{ exam.exam_title }}</strong></td>
+                        <td>{{ exam.start_time|date:"M d, Y H:i" }}</td>
+                        <td>{{ exam.end_time|date:"M d, Y H:i" }}</td>
+                        <td>
+                            {% if exam.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% elif exam.start_time > now %}
+                                <span class="badge bg-info">Upcoming</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.user_type == 'student' %}
+                                <a href="{% url 'exam_detail_student' exam.exam_id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye me-1"></i>View
+                                </a>
+                            {% else %}
+                                <a href="{% url 'exam_detail_admin' exam.exam_id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye me-1"></i>Manage
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>No exams have been created for this course yet.
+</div>
+{% endif %}
+{% endblock %}

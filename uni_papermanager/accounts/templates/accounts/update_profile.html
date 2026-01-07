@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Update Profile</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.exam_title.id_for_label }}" class="form-label">Exam Title *</label>
+                        {{ form.exam_title }}
+                        {% if form.exam_title.errors %}
+                            <div class="invalid-feedback d-block">{{ form.exam_title.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.course.id_for_label }}" class="form-label">Course *</label>
+                        {{ form.course }}
+                        {% if form.course.errors %}
+                            <div class="invalid-feedback d-block">{{ form.course.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.start_time.id_for_label }}" class="form-label">Start Time *</label>
+                            {{ form.start_time }}
+                            {% if form.start_time.errors %}
+                                <div class="invalid-feedback d-block">{{ form.start_time.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.end_time.id_for_label }}" class="form-label">End Time *</label>
+                            {{ form.end_time }}
+                            {% if form.end_time.errors %}
+                                <div class="invalid-feedback d-block">{{ form.end_time.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> Exam duration must be between 15 minutes and 24 hours.
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Update Exam
+                        </button>
+                        <a href="{% url 'exam_detail_admin' exam.exam_id %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

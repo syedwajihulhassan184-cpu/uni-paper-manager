@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Enrollments - {{ student.user.full_name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'manage_enrollments' %}">Manage Enrollments</a></li>
+        <li class="breadcrumb-item active">{{ student.user.full_name }}</li>
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <h2 class="mb-3">
+                    <i class="fas fa-user-graduate me-2"></i>{{ student.user.full_name }}
+                </h2>
+                <p class="mb-1"><strong>Email:</strong> {{ student.user.email }}</p>
+                <p class="mb-1"><strong>Student ID:</strong> {{ student.student_id }}</p>
+                <p class="mb-1"><strong>Program:</strong> {{ student.program.program_name }}</p>
+                <p class="mb-0"><strong>Department:</strong> {{ student.program.department.department_name }}</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h3 class="text-primary mb-2">{{ enrollments.count }}</h3>
+                        <p class="text-muted mb-0">Total Enrollments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enrollments Table -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Course Enrollments</h5>
+        <a href="{% url 'available_courses' %}" class="btn btn-sm btn-success">
+            <i class="fas fa-plus me-2"></i>Enroll in New Course
+        </a>
+    </div>
+    <div class="card-body">
+        {% if enrollments %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Program</th>
+                        <th>Department</th>
+                        <th>Enrolled Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in enrollments %}
+                    <tr>
+                        <td>
+                            <strong>{{ enrollment.course.course_name }}</strong>
+                        </td>
+                        <td>{{ enrollment.course.program.program_name }}</td>
+                        <td>{{ enrollment.course.program.department.department_name }}</td>
+                        <td>{{ enrollment.enrollment_date|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>Active
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'enrollment_detail' enrollment.enrollment_id %}" 
+                                   class="btn btn-outline-primary" 
+                                   title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'course_detail' enrollment.course.course_id %}" 
+                                   class="btn btn-outline-info" 
+                                   title="View Course">
+                                    <i class="fas fa-book"></i>
+                                </a>
+                                <a href="{% url 'delete_enrollment_admin' enrollment.enrollment_id %}" 
+                                   class="btn btn-outline-danger" 
+                                   onclick="return confirm('Remove {{ student.user.full_name }} from {{ enrollment.course.course_name }}?')"
+                                   title="Remove Enrollment">
+                                    <i class="fas fa-user-minus"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Course Statistics -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6 class="mb-3">Enrollment Summary</h6>
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <h4 class="text-primary">{{ enrollments.count }}</h4>
+                                <p class="text-muted mb-0">Total Courses</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-success">
+                                    {% if submission_count %}{{ submission_count }}{% else %}0{% endif %}
+                                </h4>
+                                <p class="text-muted mb-0">Exam Submissions</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-info">
+                                    {% if result_count %}{{ result_count }}{% else %}0{% endif %}
+                                </h4>
+                                <p class="text-muted mb-0">Graded Results</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+            <h5>No Enrollments</h5>
+            <p class="text-muted mb-4">This student is not enrolled in any courses yet.</p>
+            <a href="{% url 'available_courses' %}" class="btn btn-primary">
+                <i class="fas fa-search me-2"></i>Browse Courses to Enroll
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="mt-4">
+    <a href="{% url 'manage_enrollments' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Enrollments
+    </a>
+</div>
+
+{% endblock %}

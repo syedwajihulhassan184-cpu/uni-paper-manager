@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">
+    <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+</h2>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h3>{{ total_exams }}</h3>
+            <p><i class="fas fa-file-alt me-2"></i>Total Exams</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card success">
+            <h3>{{ active_exams }}</h3>
+            <p><i class="fas fa-play-circle me-2"></i>Active Exams</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card warning">
+            <h3>{{ upcoming_exams }}</h3>
+            <p><i class="fas fa-clock me-2"></i>Upcoming</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card danger">
+            <h3>{{ pending_submissions }}</h3>
+            <p><i class="fas fa-hourglass-half me-2"></i>Pending Grades</p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'create_exam' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-plus me-2"></i>Create Exam
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'create_course' %}" class="btn btn-success w-100">
+                            <i class="fas fa-book me-2"></i>Add Course
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'exam_list_admin' %}" class="btn btn-info w-100">
+                            <i class="fas fa-list me-2"></i>View All Exams
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'manage_enrollments' %}" class="btn btn-warning w-100">
+                            <i class="fas fa-users me-2"></i>Manage Enrollments
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Exams -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Exams</h5>
+        <a href="{% url 'exam_list_admin' %}" class="btn btn-sm btn-primary">View All</a>
+    </div>
+    <div class="card-body">
+        {% if recent_exams %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Exam Title</th>
+                        <th>Course</th>
+                        <th>Start Time</th>
+                        <th>Status</th>
+                        <th>Submissions</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in recent_exams %}
+                    <tr>
+                        <td><strong>{{ exam.exam_title }}</strong></td>
+                        <td>{{ exam.course.course_name }}</td>
+                        <td>{{ exam.start_time|date:"M d, Y H:i" }}</td>
+                        <td>
+                            {% if exam.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% elif exam.start_time > now %}
+                                <span class="badge bg-info">Upcoming</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">
+                                {{ exam.submission_count|default:0 }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'exam_detail_admin' exam.exam_id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-eye me-1"></i>View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            No exams created yet. <a href="{% url 'create_exam' %}">Create your first exam</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Welcome Message -->
+{% if not recent_exams %}
+<div class="card mt-4">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-graduation-cap fa-4x text-primary mb-3"></i>
+        <h4>Welcome to Admin Dashboard!</h4>
+        <p class="text-muted">Get started by creating your academic structure:</p>
+        <div class="mt-4">
+            <a href="{% url 'create_department' %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-building me-2"></i>Create Department
+            </a>
+            <a href="{% url 'create_program' %}" class="btn btn-outline-success me-2">
+                <i class="fas fa-graduation-cap me-2"></i>Create Program
+            </a>
+            <a href="{% url 'create_course' %}" class="btn btn-outline-info">
+                <i class="fas fa-book me-2"></i>Create Course
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
