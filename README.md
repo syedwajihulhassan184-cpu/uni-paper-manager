@@ -5,7 +5,7 @@ A Django-based web application for managing online examinations, student enrollm
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![Django](https://img.shields.io/badge/Django-4.2-green)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
+
 
 ---
 
